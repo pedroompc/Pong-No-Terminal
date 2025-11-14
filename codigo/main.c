@@ -1,3 +1,4 @@
+#include "game.h"
 #include "../cli-lib/include/screen.h"
 #include "../cli-lib/include/keyboard.h"
 #include "../cli-lib/include/timer.h"
@@ -8,21 +9,20 @@ int main() {
     keyboardInit();
     timerInit(20);
 
-    while (1) {
-        if (keyhit()) {
-            int ch = readch();
-            if (ch == 'q' || ch == 'Q') break;
-        }
+    GameState game;
+    jogo_inicio(&game);
+
+    while (!game.quit) {
+        processar_input(&game);
 
         if (timerTimeOver()) {
-            screenClear();
-            screenGotoxy(10, 10);
-            printf("Pong base - pressione Q para sair");
-            screenUpdate();
+            atualizar_jogo(&game);
+            renderizar(&game);
         }
     }
 
     keyboardDestroy();
     screenDestroy();
+    liberar(&game);
     return 0;
 }
