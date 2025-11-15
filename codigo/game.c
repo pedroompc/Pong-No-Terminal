@@ -31,3 +31,13 @@ void liberar(GameState *game) {
         free(game->campo);
     }
 }
+
+void processar_input(GameState *game) {
+    if (!keyhit()) return;
+
+    int ch = readch();
+    if (ch == 'q' || ch == 'Q') {
+        game->quit = true;
+    }
+}
+
