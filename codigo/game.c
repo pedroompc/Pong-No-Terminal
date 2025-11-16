@@ -41,3 +41,15 @@ void processar_input(GameState *game) {
     }
 }
 
+void atualizar_jogo(GameState *game) {
+    if (game->status != PLAYING) return;
+
+    game->bola_x += game->bola_dir_x;
+    game->bola_y += game->bola_dir_y;
+
+    if (game->bola_x < 0) game->bola_x = SCREEN_WIDTH - 1;
+    if (game->bola_x >= SCREEN_WIDTH) game->bola_x = 0;
+}
+
+
+
