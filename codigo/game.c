@@ -51,5 +51,32 @@ void atualizar_jogo(GameState *game) {
     if (game->bola_x >= SCREEN_WIDTH) game->bola_x = 0;
 }
 
+void renderizar(GameState *game) {
+    screenClear();
+
+    // bola
+    screenGotoxy(game->bola_x, game->bola_y);
+    putchar('O');
+
+    // raquete esquerda
+    for (int i = -1; i <= 1; i++) {
+        int e = game->raquete_esquerda + i;
+        if (e >= 0 && e < SCREEN_HEIGHT) {
+            screenGotoxy(0, e);
+            putchar('|');
+        }
+    }
+
+    // raquete direita
+    for (int i = -1; i <= 1; i++) {
+        int d = game->raquete_direita + i;
+        if (d >= 0 && d < SCREEN_HEIGHT) {
+            screenGotoxy(SCREEN_WIDTH-1, d);
+            putchar('|');
+        }
+    }
+
+    screenUpdate();
+}
 
 
