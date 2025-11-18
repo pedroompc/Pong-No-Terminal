@@ -88,6 +88,9 @@ void atualizar_jogo(GameState *game) {
 void renderizar(GameState *game) {
     screenClear();
 
+    screenGotoxy(SCREEN_WIDTH/2 - 3, 0);
+    printf("%d - %d", game->placar_esquerda, game->placar_direita);
+
     // bola
     screenGotoxy(game->bola_x, game->bola_y);
     putchar('O');
@@ -112,5 +115,3 @@ void renderizar(GameState *game) {
 
     screenUpdate();
 }
-
-
