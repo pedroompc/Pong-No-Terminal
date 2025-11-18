@@ -112,30 +112,31 @@ void atualizar_jogo(GameState *game) {
 void renderizar(GameState *game) {
     screenClear();
 
+    // --- desenhar placar  ---
+    screenSetColor(FG_WHITE, BG_BLACK);
     screenGotoxy(SCREEN_WIDTH/2 - 3, 0);
     printf("%d - %d", game->placar_esquerda, game->placar_direita);
 
-    // bola
+    // --- desenhar raquete esquerda ---
+    screenSetColor(FG_GREEN, BG_BLACK);   
+    screenGotoxy(1, game->raquete_esquerda - 1); printf("|");
+    screenGotoxy(1, game->raquete_esquerda    ); printf("|");
+    screenGotoxy(1, game->raquete_esquerda + 1); printf("|");
+
+    // --- desenhar raquete direita ---
+    screenSetColor(FG_GREEN, BG_BLACK);   
+    screenGotoxy(SCREEN_WIDTH - 2, game->raquete_direita - 1); printf("|");
+    screenGotoxy(SCREEN_WIDTH - 2, game->raquete_direita    ); printf("|");
+    screenGotoxy(SCREEN_WIDTH - 2, game->raquete_direita + 1); printf("|");
+
+    // --- desenhar bola ---
+    screenSetColor(FG_RED, BG_BLACK);     
     screenGotoxy(game->bola_x, game->bola_y);
-    putchar('O');
+    printf("O");
 
-    // raquete esquerda
-    for (int i = -1; i <= 1; i++) {
-        int e = game->raquete_esquerda + i;
-        if (e >= 0 && e < SCREEN_HEIGHT) {
-            screenGotoxy(0, e);
-            putchar('|');
-        }
-    }
-
-    // raquete direita
-    for (int i = -1; i <= 1; i++) {
-        int d = game->raquete_direita + i;
-        if (d >= 0 && d < SCREEN_HEIGHT) {
-            screenGotoxy(SCREEN_WIDTH-1, d);
-            putchar('|');
-        }
-    }
+    // restaura cor padrão
+    screenSetColor(FG_WHITE, BG_BLACK);
 
     screenUpdate();
 }
+
