@@ -66,10 +66,14 @@ void atualizar_jogo(GameState *game) {
 
     game->bola_x += game->bola_dir_x;
     game->bola_y += game->bola_dir_y;
+    if (game->bola_y <= 0 || game->bola_y >= SCREEN_HEIGHT - 1) {
+        game->bola_dir_y *= -1;
+    }
 
     if (game->bola_x < 0) game->bola_x = SCREEN_WIDTH - 1;
     if (game->bola_x >= SCREEN_WIDTH) game->bola_x = 0;
 }
+
 
 void renderizar(GameState *game) {
     screenClear();
