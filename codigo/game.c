@@ -62,28 +62,52 @@ void processar_input(GameState *game) {
 
 
 void atualizar_jogo(GameState *game) {
-    if (game->status != PLAYING) return;
 
-    game->bola_x += game->bola_dir_x;
-    game->bola_y += game->bola_dir_y;
+    // mover bola
+    game->bola_x += game->bola_vel_x;
+    game->bola_y += game->bola_vel_y;
 
-    if (game->bola_y <= 0 || game->bola_y >= SCREEN_HEIGHT - 1) {
-        game->bola_dir_y *= -1;
+    if (game->bola_x < 0) {
+        game->placar_direita++;
+        // reposicionar bola
+        game->bola_x = SCREEN_WIDTH / 2;
+        game->bola_y = SCREEN_HEIGHT / 2;
+        game->bola_vel_x = 1;  // recomeça para a direita
+        game->bola_vel_y = (game->bola_vel_y > 0 ? 1 : -1);
+        return;
     }
 
-    if (game->bola_x <= 1 && abs(game->bola_y - game->raquete_esquerda) <= 2) {
-        game->bola_dir_x = abs(game->bola_dir_x);
+    if (game->bola_x >= SCREEN_WIDTH) {
+        game->placar_esquerda++;
+        // reposicionar bola
+        game->bola_x = SCREEN_WIDTH / 2;
+        game->bola_y = SCREEN_HEIGHT / 2;
+        game->bola_vel_x = -1; // recomeça para a esquerda
+        game->bola_vel_y = (game->bola_vel_y > 0 ? 1 : -1);
+        return;
     }
 
-    if (game->bola_x >= SCREEN_WIDTH - 2 && abs(game->bola_y - game->raquete_direita) <= 2) {
-        game->bola_dir_x = -abs(game->bola_dir_x);
+    // colisão com topo
+    if (game->bola_y <= 0 || game->bola_y >= SCREEN_HEIGHT-1) {
+        game->bola_vel_y *= -1;
     }
 
-    if (game->bola_x < 0) game->bola_x = SCREEN_WIDTH - 1;
-    if (game->bola_x >= SCREEN_WIDTH) game->bola_x = 0;
+    // colisão com raquete esquerda
+    if (game->bola_x == 1) {
+        if (game->bola_y >= game->raquete_esquerda - 1 &&
+            game->bola_y <= game->raquete_esquerda + 1) {
+            game->bola_vel_x *= -1;
+        }
+    }
+
+    // colisão com raquete direita
+    if (game->bola_x == SCREEN_WIDTH - 2) {
+        if (game->bola_y >= game->raquete_direita - 1 &&
+            game->bola_y <= game->raquete_direita + 1) {
+            game->bola_vel_x *= -1;
+        }
+    }
 }
-
-
 
 void renderizar(GameState *game) {
     screenClear();
