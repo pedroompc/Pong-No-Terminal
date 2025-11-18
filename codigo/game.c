@@ -63,48 +63,57 @@ void processar_input(GameState *game) {
 
 void atualizar_jogo(GameState *game) {
 
-    // mover bola
-    game->bola_x += game->bola_vel_x;
-    game->bola_y += game->bola_vel_y;
+    // Mover bola (usando dir em vez de vel)
+    game->bola_x += game->bola_dir_x;
+    game->bola_y += game->bola_dir_y;
 
+    // --- Ponto para a direita ---
     if (game->bola_x < 0) {
         game->placar_direita++;
-        // reposicionar bola
+
+        // Resetar bola
         game->bola_x = SCREEN_WIDTH / 2;
         game->bola_y = SCREEN_HEIGHT / 2;
-        game->bola_vel_x = 1;  // recomeça para a direita
-        game->bola_vel_y = (game->bola_vel_y > 0 ? 1 : -1);
+        game->bola_dir_x = 1;
+        game->bola_dir_y = (game->bola_dir_y >= 0 ? 1 : -1);
         return;
     }
 
+    // --- Ponto para a esquerda ---
     if (game->bola_x >= SCREEN_WIDTH) {
         game->placar_esquerda++;
-        // reposicionar bola
+
+        // Resetar bola
         game->bola_x = SCREEN_WIDTH / 2;
         game->bola_y = SCREEN_HEIGHT / 2;
-        game->bola_vel_x = -1; // recomeça para a esquerda
-        game->bola_vel_y = (game->bola_vel_y > 0 ? 1 : -1);
+        game->bola_dir_x = -1;
+        game->bola_dir_y = (game->bola_dir_y >= 0 ? 1 : -1);
         return;
     }
 
-    // colisão com topo
-    if (game->bola_y <= 0 || game->bola_y >= SCREEN_HEIGHT-1) {
-        game->bola_vel_y *= -1;
+    // --- Colisão com topo/fundo ---
+    if (game->bola_y <= 0 || game->bola_y >= SCREEN_HEIGHT - 1) {
+        game->bola_dir_y *= -1;
+        return;
     }
 
-    // colisão com raquete esquerda
-    if (game->bola_x == 1) {
+    // --- Colisão Raquete Esquerda ---
+    if (game->bola_x <= 1) {
         if (game->bola_y >= game->raquete_esquerda - 1 &&
             game->bola_y <= game->raquete_esquerda + 1) {
-            game->bola_vel_x *= -1;
+            
+            game->bola_dir_x = 1; // Força direção para direita (evita bugs)
+            return;
         }
     }
 
-    // colisão com raquete direita
-    if (game->bola_x == SCREEN_WIDTH - 2) {
+    // --- Colisão Raquete Direita ---
+    if (game->bola_x >= SCREEN_WIDTH - 2) {
         if (game->bola_y >= game->raquete_direita - 1 &&
             game->bola_y <= game->raquete_direita + 1) {
-            game->bola_vel_x *= -1;
+            
+            game->bola_dir_x = -1; // Força direção para esquerda
+            return;
         }
     }
 }
