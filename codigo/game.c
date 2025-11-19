@@ -63,7 +63,9 @@ void processar_input(GameState *game) {
 
 void atualizar_jogo(GameState *game) {
 
-    // Mover bola (usando dir em vez de vel)
+    if (game->status != PLAYING) return;
+
+    // Mover bola
     game->bola_x += game->bola_dir_x;
     game->bola_y += game->bola_dir_y;
 
@@ -71,11 +73,16 @@ void atualizar_jogo(GameState *game) {
     if (game->bola_x < 0) {
         game->placar_direita++;
 
-        // Resetar bola
-        game->bola_x = SCREEN_WIDTH / 2;
-        game->bola_y = SCREEN_HEIGHT / 2;
-        game->bola_dir_x = 1;
-        game->bola_dir_y = (game->bola_dir_y >= 0 ? 1 : -1);
+        if (game->placar_direita >= WINNING_SCORE) {
+            game->status = GAME_OVER;
+            game->jogador_vencedor = 2; // Jogador da direita venceu
+        } else {
+            // Resetar bola
+            game->bola_x = SCREEN_WIDTH / 2;
+            game->bola_y = SCREEN_HEIGHT / 2;
+            game->bola_dir_x = 1;
+            game->bola_dir_y = 0;
+        }
         return;
     }
 
@@ -83,36 +90,40 @@ void atualizar_jogo(GameState *game) {
     if (game->bola_x >= SCREEN_WIDTH) {
         game->placar_esquerda++;
 
-        // Resetar bola
-        game->bola_x = SCREEN_WIDTH / 2;
-        game->bola_y = SCREEN_HEIGHT / 2;
-        game->bola_dir_x = -1;
-        game->bola_dir_y = (game->bola_dir_y >= 0 ? 1 : -1);
+        
+        if (game->placar_esquerda >= WINNING_SCORE) {
+            game->status = GAME_OVER;
+            game->jogador_vencedor = 1; // Jogador da esquerda venceu
+        } else {
+            // Resetar bola
+            game->bola_x = SCREEN_WIDTH / 2;
+            game->bola_y = SCREEN_HEIGHT / 2;
+            game->bola_dir_x = -1;
+            game->bola_dir_y = 0; // 
+        }
         return;
     }
-
-    // --- Colisão com topo/fundo ---
+    
+    // --- Colisão com topo/fundo --- 
     if (game->bola_y <= 0 || game->bola_y >= SCREEN_HEIGHT - 1) {
         game->bola_dir_y *= -1;
         return;
     }
 
-    // --- Colisão Raquete Esquerda ---
+    // --- Colisão Raquete Esquerda --- 
     if (game->bola_x <= 1) {
         if (game->bola_y >= game->raquete_esquerda - 1 &&
             game->bola_y <= game->raquete_esquerda + 1) {
-            
-            game->bola_dir_x = 1; // Força direção para direita (evita bugs)
+            game->bola_dir_x = 1;
             return;
         }
     }
 
-    // --- Colisão Raquete Direita ---
+    // --- Colisão Raquete Direita --- 
     if (game->bola_x >= SCREEN_WIDTH - 2) {
         if (game->bola_y >= game->raquete_direita - 1 &&
             game->bola_y <= game->raquete_direita + 1) {
-            
-            game->bola_dir_x = -1; // Força direção para esquerda
+            game->bola_dir_x = -1;
             return;
         }
     }
