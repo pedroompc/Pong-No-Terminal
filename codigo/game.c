@@ -34,28 +34,34 @@ void liberar(GameState *game) {
 
 void processar_input(GameState *game) {
     if (!keyhit()) return;
-
+    
     int ch = readch();
-
-    if (ch == 'q' || ch == 'Q') {
-        game->quit = true;
-        return;
+    if (game->status == GAME_OVER) {
+        if (ch == 'q' || ch == 'Q') {
+            game->quit = true;
+        }
+        return; 
     }
 
     if (game->status == PLAYING) {
-        switch (ch) {
-            case 'w':
-                if (game->raquete_esquerda > 1) game->raquete_esquerda--;
+        switch(ch) {
+            case 'w': 
+                if (game->raquete_esquerda > 1) game->raquete_esquerda--; 
                 break;
-            case 's':
-                if (game->raquete_esquerda < SCREEN_HEIGHT-2) game->raquete_esquerda++;
+            case 's': 
+                if (game->raquete_esquerda < SCREEN_HEIGHT-2) game->raquete_esquerda++; 
                 break;
-            case 'i':
-                if (game->raquete_direita > 1) game->raquete_direita--;
+            case 'i': 
+                if (game->raquete_direita > 1) game->raquete_direita--; 
                 break;
-            case 'k':
-                if (game->raquete_direita < SCREEN_HEIGHT-2) game->raquete_direita++;
+            case 'k': 
+                if (game->raquete_direita < SCREEN_HEIGHT-2) game->raquete_direita++; 
                 break;
+            
+            case 'q':
+            case 'Q':
+                game->quit = true; 
+                return;
         }
     }
 }
