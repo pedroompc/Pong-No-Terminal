@@ -8,6 +8,7 @@
 
 #define SCREEN_WIDTH 80
 #define SCREEN_HEIGHT 24
+#define WINNING_SCORE 10
 
 typedef enum {
     MENU,
