@@ -48,6 +48,16 @@ void mostrar_menu(GameState *game) {
         printf(">>> PRESSIONE ESPAÇO <<<");
         screenSetColor(WHITE, BLACK);
     }
+    screenGotoxy(SCREEN_WIDTH/2 - 8, SCREEN_HEIGHT/2 + 6);
+    printf("MELHORES PARTIDAS:");
+    ScoreNode *atual = game->historico_placar;
+    int count = 0;
+    while (atual != NULL && count < 3) {
+        screenGotoxy(SCREEN_WIDTH/2 - 6, SCREEN_HEIGHT/2 + 8 + count);
+        printf("%d. %2d - %-2d", count + 1, atual->placar_esquerda, atual->placar_direita);
+        atual = atual->next;
+        count++;
+    }
 
 }
 
@@ -84,7 +94,26 @@ void liberar(GameState *game) {
         }
         free(game->campo);
     }
+        // liberar histórico de placares
+    ScoreNode *cur = game->historico_placar;
+    while (cur) {
+        ScoreNode *tmp = cur->next;
+        free(cur);
+        cur = tmp;
+    }
+    game->historico_placar = NULL;
+
 }
+
+void add_placar_historico(GameState *game) {
+    ScoreNode *novo = malloc(sizeof(ScoreNode));
+    if (!novo) return;
+    novo->placar_esquerda = game->placar_esquerda;
+    novo->placar_direita = game->placar_direita;
+    novo->next = game->historico_placar;
+    game->historico_placar = novo;
+}
+
 
 void processar_input(GameState *game) {
     if (!keyhit()) return;
@@ -144,6 +173,7 @@ void atualizar_jogo(GameState *game) {
         game->placar_direita++;
 
         if (game->placar_direita >= WINNING_SCORE) {
+            add_placar_historico(game);
             game->status = GAME_OVER;
             game->jogador_vencedor = 2;
         } else {
@@ -157,8 +187,10 @@ void atualizar_jogo(GameState *game) {
         game->placar_esquerda++;
         
         if (game->placar_esquerda >= WINNING_SCORE) {
+            add_placar_historico(game);
             game->status = GAME_OVER;
             game->jogador_vencedor = 1;
+
         } else {
             resetar_bola(game);
         }
