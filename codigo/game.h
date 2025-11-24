@@ -17,9 +17,9 @@ typedef enum {
 } GameStatus;
 
 typedef struct {
+    float bola_x, bola_y;
+    float bola_dir_x, bola_dir_y;
     int raquete_esquerda, raquete_direita;
-    int bola_x, bola_y;
-    int bola_dir_x, bola_dir_y;
     int placar_esquerda, placar_direita;
     bool quit;
     GameStatus status;
@@ -31,6 +31,8 @@ void jogo_inicio(GameState *game);
 void processar_input(GameState *game);
 void atualizar_jogo(GameState *game);
 void renderizar(GameState *game);
+void resetar_bola(GameState *game);
+
 void liberar(GameState *game);
 
 #endif
