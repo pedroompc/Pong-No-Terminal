@@ -48,6 +48,7 @@ void mostrar_menu(GameState *game) {
         printf(">>> PRESSIONE ESPAÇO <<<");
         screenSetColor(WHITE, BLACK);
     }
+
 }
 
 
@@ -67,6 +68,13 @@ void jogo_inicio(GameState *game) {
     game->quit = false;
     game->status = MENU;
     game->jogador_vencedor = 0;
+
+        game->placar_esquerda = game->placar_direita = 0;
+    game->historico_placar = NULL;   // <-- inicializa histórico
+    game->quit = false;
+    game->status = MENU;
+    game->jogador_vencedor = 0;
+
 }
 
 void liberar(GameState *game) {
