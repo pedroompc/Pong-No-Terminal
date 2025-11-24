@@ -15,6 +15,11 @@ typedef enum {
     PLAYING,
     GAME_OVER
 } GameStatus;
+typedef struct ScoreNode {
+    int placar_esquerda;
+    int placar_direita;
+    struct ScoreNode *next;
+} ScoreNode;
 
 typedef struct {
     int raquete_esquerda, raquete_direita;
