@@ -8,7 +8,7 @@
 void resetar_bola(GameState *game) {
     game->bola_x = SCREEN_WIDTH / 2;
     game->bola_y = SCREEN_HEIGHT / 2;  
-    game->bola_dir_x = 1;  // COMMIT 26: sem aleatoriedade ainda
+    game->bola_dir_x = 1;
     game->bola_dir_y = 0; 
 }
 
