@@ -4,9 +4,9 @@
 #include <time.h>
 #include <stdio.h>
 #include <math.h>
+
 #define BALL_SPEED 1.8f
 #define MAX_SPEED 3.5f
-
 
 void resetar_bola(GameState *game) {
     game->bola_x = SCREEN_WIDTH / 2;
@@ -48,6 +48,7 @@ void mostrar_menu(GameState *game) {
         printf(">>> PRESSIONE ESPAÇO <<<");
         screenSetColor(WHITE, BLACK);
     }
+    
     screenGotoxy(SCREEN_WIDTH/2 - 8, SCREEN_HEIGHT/2 + 6);
     printf("MELHORES PARTIDAS:");
     ScoreNode *atual = game->historico_placar;
@@ -58,10 +59,7 @@ void mostrar_menu(GameState *game) {
         atual = atual->next;
         count++;
     }
-
 }
-
-
 
 void jogo_inicio(GameState *game) {
     srand(time(NULL));
@@ -74,17 +72,12 @@ void jogo_inicio(GameState *game) {
 
     game->raquete_esquerda = game->raquete_direita = SCREEN_HEIGHT / 2;
     resetar_bola(game);
+    
     game->placar_esquerda = game->placar_direita = 0;
+    game->historico_placar = NULL;
     game->quit = false;
     game->status = MENU;
     game->jogador_vencedor = 0;
-
-        game->placar_esquerda = game->placar_direita = 0;
-    game->historico_placar = NULL;   // <-- inicializa histórico
-    game->quit = false;
-    game->status = MENU;
-    game->jogador_vencedor = 0;
-
 }
 
 void liberar(GameState *game) {
@@ -94,7 +87,7 @@ void liberar(GameState *game) {
         }
         free(game->campo);
     }
-        // liberar histórico de placares
+    
     ScoreNode *cur = game->historico_placar;
     while (cur) {
         ScoreNode *tmp = cur->next;
@@ -102,7 +95,6 @@ void liberar(GameState *game) {
         cur = tmp;
     }
     game->historico_placar = NULL;
-
 }
 
 void add_placar_historico(GameState *game) {
@@ -113,7 +105,6 @@ void add_placar_historico(GameState *game) {
     novo->next = game->historico_placar;
     game->historico_placar = novo;
 }
-
 
 void processar_input(GameState *game) {
     if (!keyhit()) return;
@@ -126,7 +117,6 @@ void processar_input(GameState *game) {
         else if (ch == 'q' || ch == 'Q') game->quit = true;
         return;
     }
-
     
     if (game->status == GAME_OVER) {
         if (ch == 'q' || ch == 'Q') {
@@ -134,7 +124,6 @@ void processar_input(GameState *game) {
         }
         return; 
     }
-
 
     if (game->status == PLAYING) {
         switch(ch) {
@@ -161,6 +150,7 @@ void processar_input(GameState *game) {
 }
 
 void atualizar_jogo(GameState *game) {
+    static int contador_colisoes = 0;
 
     if (game->status != PLAYING) return;
 
@@ -179,6 +169,7 @@ void atualizar_jogo(GameState *game) {
         } else {
             resetar_bola(game);
         }
+        contador_colisoes = 0;
         return;
     }
 
@@ -190,10 +181,10 @@ void atualizar_jogo(GameState *game) {
             add_placar_historico(game);
             game->status = GAME_OVER;
             game->jogador_vencedor = 1;
-
         } else {
             resetar_bola(game);
         }
+        contador_colisoes = 0;
         return;
     }
     
@@ -202,55 +193,52 @@ void atualizar_jogo(GameState *game) {
         game->bola_dir_y *= -1;
         printf("\a");
         fflush(stdout);
-
         return;
     }
 
- // --- Colisão Raquete Esquerda --- 
-if (game->bola_x <= 1) {
-    if (game->bola_y >= game->raquete_esquerda - 1 &&
-        game->bola_y <= game->raquete_esquerda + 1) {
+    // --- Colisão Raquete Esquerda --- 
+    if (game->bola_x <= 1.5f) { // Ajustado para float
+        if (fabs(game->bola_y - game->raquete_esquerda) <= 2.5f) { // Ajustado para float
 
-        float hit_pos = (game->bola_y - game->raquete_esquerda) / 2.0f;
-        game->bola_dir_y = hit_pos;
+            float hit_pos = (game->bola_y - game->raquete_esquerda) / 2.0f;
+            game->bola_dir_y = hit_pos;
 
-        game->bola_dir_x = fabs(game->bola_dir_x); // garante que vá para direita
+            game->bola_dir_x = fabs(game->bola_dir_x); // garante que vá para direita
+            game->bola_x = 2; // Descola da parede
 
-        contador_colisoes++;
+            contador_colisoes++;
 
-        if (contador_colisoes % 5 == 0 && fabs(game->bola_dir_x) < MAX_SPEED) {
-            game->bola_dir_x *= 1.1f;
+            if (contador_colisoes % 5 == 0 && fabs(game->bola_dir_x) < MAX_SPEED) {
+                game->bola_dir_x *= 1.1f;
+            }
+
+            printf("\a");
+            fflush(stdout);
+            return;
         }
-
-        printf("\a");
-        fflush(stdout);
-        return;
     }
-}
 
-// --- Colisão Raquete Direita --- 
-if (game->bola_x >= SCREEN_WIDTH - 2) {
-    if (game->bola_y >= game->raquete_direita - 1 &&
-        game->bola_y <= game->raquete_direita + 1) {
+    // --- Colisão Raquete Direita --- 
+    if (game->bola_x >= SCREEN_WIDTH - 2.5f) { // Ajustado para float
+        if (fabs(game->bola_y - game->raquete_direita) <= 2.5f) { // Ajustado para float
 
-        float hit_pos = (game->bola_y - game->raquete_direita) / 2.0f;
-        game->bola_dir_y = hit_pos;
+            float hit_pos = (game->bola_y - game->raquete_direita) / 2.0f;
+            game->bola_dir_y = hit_pos;
 
-        game->bola_dir_x = -fabs(game->bola_dir_x); // garante que vá para esquerda
+            game->bola_dir_x = -fabs(game->bola_dir_x); // garante que vá para esquerda
+            game->bola_x = SCREEN_WIDTH - 3; // Descola da parede
 
-        contador_colisoes++;
+            contador_colisoes++;
 
-        if (contador_colisoes % 5 == 0 && fabs(game->bola_dir_x) < MAX_SPEED) {
-            game->bola_dir_x *= 1.1f;
+            if (contador_colisoes % 5 == 0 && fabs(game->bola_dir_x) < MAX_SPEED) {
+                game->bola_dir_x *= 1.1f;
+            }
+
+            printf("\a");
+            fflush(stdout);
+            return;
         }
-
-        printf("\a");
-        fflush(stdout);
-        return;
     }
-}
-
-
 }
 
 void mostrar_game_over(GameState *game) {
@@ -273,7 +261,6 @@ void mostrar_game_over(GameState *game) {
 }
 
 void renderizar(GameState *game) {
-    
     if (game->status == MENU) {
         mostrar_menu(game);
     } 
@@ -301,14 +288,11 @@ void renderizar(GameState *game) {
         screenGotoxy(SCREEN_WIDTH - 2, game->raquete_direita + 1); printf("|");
 
         // --- desenhar bola ---
-        screenSetColor(FG_RED, BG_BLACK);       
-        screenGotoxy(game->bola_x, game->bola_y);
+        screenSetColor(FG_RED, BG_BLACK);        
+        screenGotoxy((int)game->bola_x, (int)game->bola_y);
         printf("O");
         
         screenSetColor(FG_WHITE, BG_BLACK);
     } 
-
     screenUpdate();
-
-
 }
