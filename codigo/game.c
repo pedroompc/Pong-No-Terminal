@@ -174,27 +174,37 @@ void atualizar_jogo(GameState *game) {
 
     // --- Colisão Raquete Esquerda --- 
     if (game->bola_x <= 1) {
-        if (game->bola_y >= game->raquete_esquerda - 1 &&
-            game->bola_y <= game->raquete_esquerda + 1) {
-            game->bola_dir_x = 1;
-            printf("\a");
-            fflush(stdout);
+    if (game->bola_y >= game->raquete_esquerda - 1 &&
+        game->bola_y <= game->raquete_esquerda + 1) {
 
-            return;
-        }
+        float hit_pos = (game->bola_y - game->raquete_esquerda) / 2.0f;
+        game->bola_dir_y = hit_pos;
+
+        game->bola_dir_x = fabsf(game->bola_dir_x) * 1.1f;
+
+        printf("\a");
+        fflush(stdout);
+        return;
     }
+}
+
 
     // --- Colisão Raquete Direita --- 
     if (game->bola_x >= SCREEN_WIDTH - 2) {
-        if (game->bola_y >= game->raquete_direita - 1 &&
-            game->bola_y <= game->raquete_direita + 1) {
-            game->bola_dir_x = -1;
-            printf("\a");
-            fflush(stdout);
+    if (game->bola_y >= game->raquete_direita - 1 &&
+        game->bola_y <= game->raquete_direita + 1) {
 
-            return;
-        }
+        float hit_pos = (game->bola_y - game->raquete_direita) / 2.0f;
+        game->bola_dir_y = hit_pos;
+
+        game->bola_dir_x = -fabsf(game->bola_dir_x) * 1.1f;
+
+        printf("\a");
+        fflush(stdout);
+        return;
     }
+}
+
 }
 
 void mostrar_game_over(GameState *game) {
