@@ -166,7 +166,7 @@ void atualizar_jogo(GameState *game) {
         return;
     }
 
-   // --- Colisão Raquete Esquerda --- 
+ // --- Colisão Raquete Esquerda --- 
 if (game->bola_x <= 1) {
     if (game->bola_y >= game->raquete_esquerda - 1 &&
         game->bola_y <= game->raquete_esquerda + 1) {
@@ -174,7 +174,13 @@ if (game->bola_x <= 1) {
         float hit_pos = (game->bola_y - game->raquete_esquerda) / 2.0f;
         game->bola_dir_y = hit_pos;
 
-        game->bola_dir_x = fabsf(game->bola_dir_x) * 1.1f;
+        game->bola_dir_x = fabs(game->bola_dir_x); // garante que vá para direita
+
+        contador_colisoes++;
+
+        if (contador_colisoes % 5 == 0 && fabs(game->bola_dir_x) < MAX_SPEED) {
+            game->bola_dir_x *= 1.1f;
+        }
 
         printf("\a");
         fflush(stdout);
@@ -190,7 +196,13 @@ if (game->bola_x >= SCREEN_WIDTH - 2) {
         float hit_pos = (game->bola_y - game->raquete_direita) / 2.0f;
         game->bola_dir_y = hit_pos;
 
-        game->bola_dir_x = -fabsf(game->bola_dir_x) * 1.1f;
+        game->bola_dir_x = -fabs(game->bola_dir_x); // garante que vá para esquerda
+
+        contador_colisoes++;
+
+        if (contador_colisoes % 5 == 0 && fabs(game->bola_dir_x) < MAX_SPEED) {
+            game->bola_dir_x *= 1.1f;
+        }
 
         printf("\a");
         fflush(stdout);
