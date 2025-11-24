@@ -166,6 +166,9 @@ void atualizar_jogo(GameState *game) {
     // --- Colisão com topo/fundo --- 
     if (game->bola_y <= 0 || game->bola_y >= SCREEN_HEIGHT - 1) {
         game->bola_dir_y *= -1;
+        printf("\a");
+        fflush(stdout);
+
         return;
     }
 
@@ -174,6 +177,9 @@ void atualizar_jogo(GameState *game) {
         if (game->bola_y >= game->raquete_esquerda - 1 &&
             game->bola_y <= game->raquete_esquerda + 1) {
             game->bola_dir_x = 1;
+            printf("\a");
+            fflush(stdout);
+
             return;
         }
     }
@@ -183,6 +189,9 @@ void atualizar_jogo(GameState *game) {
         if (game->bola_y >= game->raquete_direita - 1 &&
             game->bola_y <= game->raquete_direita + 1) {
             game->bola_dir_x = -1;
+            printf("\a");
+            fflush(stdout);
+
             return;
         }
     }
