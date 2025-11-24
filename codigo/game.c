@@ -10,15 +10,9 @@
 
 void resetar_bola(GameState *game) {
     game->bola_x = SCREEN_WIDTH / 2;
-    game->bola_y = SCREEN_HEIGHT / 2;  
-    game->bola_dir_x = 1;
-    game->bola_dir_y = 0;
-    
-    game->bola_x = SCREEN_WIDTH / 2;
     game->bola_y = SCREEN_HEIGHT / 2;
     game->bola_dir_x = (rand() % 2) ? BALL_SPEED : -BALL_SPEED;
     game->bola_dir_y = ((rand() % 3) - 1) * 0.7f;
-
 }
 
 void mostrar_estrelas() {
@@ -172,8 +166,8 @@ void atualizar_jogo(GameState *game) {
         return;
     }
 
-    // --- Colisão Raquete Esquerda --- 
-    if (game->bola_x <= 1) {
+   // --- Colisão Raquete Esquerda --- 
+if (game->bola_x <= 1) {
     if (game->bola_y >= game->raquete_esquerda - 1 &&
         game->bola_y <= game->raquete_esquerda + 1) {
 
@@ -188,9 +182,8 @@ void atualizar_jogo(GameState *game) {
     }
 }
 
-
-    // --- Colisão Raquete Direita --- 
-    if (game->bola_x >= SCREEN_WIDTH - 2) {
+// --- Colisão Raquete Direita --- 
+if (game->bola_x >= SCREEN_WIDTH - 2) {
     if (game->bola_y >= game->raquete_direita - 1 &&
         game->bola_y <= game->raquete_direita + 1) {
 
@@ -204,6 +197,7 @@ void atualizar_jogo(GameState *game) {
         return;
     }
 }
+
 
 }
 
