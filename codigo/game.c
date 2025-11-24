@@ -10,15 +10,9 @@
 
 void resetar_bola(GameState *game) {
     game->bola_x = SCREEN_WIDTH / 2;
-    game->bola_y = SCREEN_HEIGHT / 2;  
-    game->bola_dir_x = 1;
-    game->bola_dir_y = 0;
-    
-    game->bola_x = SCREEN_WIDTH / 2;
     game->bola_y = SCREEN_HEIGHT / 2;
     game->bola_dir_x = (rand() % 2) ? BALL_SPEED : -BALL_SPEED;
     game->bola_dir_y = ((rand() % 3) - 1) * 0.7f;
-
 }
 
 void mostrar_estrelas() {
