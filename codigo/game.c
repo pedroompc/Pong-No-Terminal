@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include <stdio.h>
+#include <math.h>
+#define BALL_SPEED 1.8f
+#define MAX_SPEED 3.5f
 
 
 void resetar_bola(GameState *game) {
