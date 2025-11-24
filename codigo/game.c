@@ -235,4 +235,8 @@ void renderizar(GameState *game) {
     } 
 
     screenUpdate();
+
+#define BALL_SPEED 1.8f
+#define MAX_SPEED 2.5f
+
 }
