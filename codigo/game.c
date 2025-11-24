@@ -3,6 +3,52 @@
 #include <string.h>
 #include <time.h>
 
+
+
+void resetar_bola(GameState *game) {
+    game->bola_x = SCREEN_WIDTH / 2;
+    game->bola_y = SCREEN_HEIGHT / 2;  
+    game->bola_dir_x = (rand() % 2) ? 1 : -1;
+    game->bola_dir_y = 0; 
+}
+
+void mostrar_estrelas() {
+    for (int i = 0; i < 15; i++) {
+        screenGotoxy(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
+        putchar((rand() % 2) ? '.' : '*');
+    }
+}
+
+void mostrar_menu(GameState *game) {
+    screenClear();
+    mostrar_estrelas();
+
+    screenSetColor(YELLOW, BLACK);
+    screenGotoxy(SCREEN_WIDTH/2 - 10, SCREEN_HEIGHT/2 - 5);
+    printf("====================");
+    screenGotoxy(SCREEN_WIDTH/2 - 10, SCREEN_HEIGHT/2 - 4);
+    printf("    PONG DELUXE     ");
+    screenGotoxy(SCREEN_WIDTH/2 - 10, SCREEN_HEIGHT/2 - 3);
+    printf("====================");
+    screenSetColor(WHITE, BLACK);
+
+    screenGotoxy(SCREEN_WIDTH/2 - 15, SCREEN_HEIGHT/2 - 1);
+    printf("> ESPAÇO - Iniciar Jogo");
+    screenGotoxy(SCREEN_WIDTH/2 - 15, SCREEN_HEIGHT/2);
+    printf("> Q - Sair");
+    screenGotoxy(SCREEN_WIDTH/2 - 15, SCREEN_HEIGHT/2 + 1);
+    printf("> R - Resetar Placar");
+
+    if ((time(NULL) % 2) == 0) {
+        screenSetColor(GREEN, BLACK);
+        screenGotoxy(SCREEN_WIDTH/2 - 10, SCREEN_HEIGHT/2 + 3);
+        printf(">>> PRESSIONE ESPAÇO <<<");
+        screenSetColor(WHITE, BLACK);
+    }
+}
+
+
+
 void jogo_inicio(GameState *game) {
     srand(time(NULL));
 
@@ -13,13 +59,10 @@ void jogo_inicio(GameState *game) {
     }
 
     game->raquete_esquerda = game->raquete_direita = SCREEN_HEIGHT / 2;
-    game->bola_x = SCREEN_WIDTH / 2;
-    game->bola_y = SCREEN_HEIGHT / 2;
-    game->bola_dir_x = 1;
-    game->bola_dir_y = 0;
+    resetar_bola(game);
     game->placar_esquerda = game->placar_direita = 0;
     game->quit = false;
-    game->status = PLAYING;
+    game->status = MENU;
     game->jogador_vencedor = 0;
 }
 
@@ -36,12 +79,22 @@ void processar_input(GameState *game) {
     if (!keyhit()) return;
     
     int ch = readch();
+    
+    // ===== MENU =====
+    if (game->status == MENU) {
+        if (ch == ' ') game->status = PLAYING;
+        else if (ch == 'q' || ch == 'Q') game->quit = true;
+        return;
+    }
+
+    
     if (game->status == GAME_OVER) {
         if (ch == 'q' || ch == 'Q') {
             game->quit = true;
         }
         return; 
     }
+
 
     if (game->status == PLAYING) {
         switch(ch) {
@@ -60,12 +113,12 @@ void processar_input(GameState *game) {
             
             case 'q':
             case 'Q':
-                game->quit = true; 
+                game->status = MENU;
+                resetar_bola(game);
                 return;
         }
     }
 }
-
 
 void atualizar_jogo(GameState *game) {
 
@@ -81,13 +134,9 @@ void atualizar_jogo(GameState *game) {
 
         if (game->placar_direita >= WINNING_SCORE) {
             game->status = GAME_OVER;
-            game->jogador_vencedor = 2; // Jogador da direita venceu
+            game->jogador_vencedor = 2;
         } else {
-            // Resetar bola
-            game->bola_x = SCREEN_WIDTH / 2;
-            game->bola_y = SCREEN_HEIGHT / 2;
-            game->bola_dir_x = 1;
-            game->bola_dir_y = 0;
+            resetar_bola(game);
         }
         return;
     }
@@ -95,17 +144,12 @@ void atualizar_jogo(GameState *game) {
     // --- Ponto para a esquerda ---
     if (game->bola_x >= SCREEN_WIDTH) {
         game->placar_esquerda++;
-
         
         if (game->placar_esquerda >= WINNING_SCORE) {
             game->status = GAME_OVER;
-            game->jogador_vencedor = 1; // Jogador da esquerda venceu
+            game->jogador_vencedor = 1;
         } else {
-            // Resetar bola
-            game->bola_x = SCREEN_WIDTH / 2;
-            game->bola_y = SCREEN_HEIGHT / 2;
-            game->bola_dir_x = -1;
-            game->bola_dir_y = 0; // 
+            resetar_bola(game);
         }
         return;
     }
@@ -137,6 +181,7 @@ void atualizar_jogo(GameState *game) {
 
 void mostrar_game_over(GameState *game) {
     screenClear();
+    mostrar_estrelas();
     
     const char* vencedor_msg = game->jogador_vencedor == 1 ? 
         "JOGADOR 1 VENCEU!" : "JOGADOR 2 VENCEU!";
@@ -153,12 +198,15 @@ void mostrar_game_over(GameState *game) {
     printf("Pressione Q para sair");
 }
 
-
 void renderizar(GameState *game) {
-      
-    if (game->status == GAME_OVER) {
+    
+    if (game->status == MENU) {
+        mostrar_menu(game);
+    } 
+    else if (game->status == GAME_OVER) {
         mostrar_game_over(game); 
-    } else { 
+    } 
+    else if (game->status == PLAYING) { 
         screenClear();
 
         // --- desenhar placar ---
@@ -182,7 +230,6 @@ void renderizar(GameState *game) {
         screenSetColor(FG_RED, BG_BLACK);       
         screenGotoxy(game->bola_x, game->bola_y);
         printf("O");
-
         
         screenSetColor(FG_WHITE, BG_BLACK);
     } 
