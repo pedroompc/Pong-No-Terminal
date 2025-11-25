@@ -8,7 +8,7 @@
 
 #define BALL_SPEED 1.8f
 #define MAX_SPEED 3.5f
-#define SCORES_FILE "pong_scores.dat" // COMMIT 38
+#define SCORES_FILE "pong_scores.dat" 
 
 void salvar_placar(GameState *game);
 void carregar_placar(GameState *game);
