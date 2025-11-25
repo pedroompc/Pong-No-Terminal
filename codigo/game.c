@@ -234,82 +234,63 @@ void processar_input(GameState *game) {
 }
 
 void atualizar_jogo(GameState *game) {
-    static int contador_colisoes = 0; 
-
+    static int contador_colisoes = 0;
     if (game->status != PLAYING) return;
 
-    // Mover bola
+    // Movimento da bola
     game->bola_x += game->bola_dir_x;
     game->bola_y += game->bola_dir_y;
 
-    // Ponto Direita
-    if (game->bola_x < 0) {
-        game->placar_direita++;
-        if (game->placar_direita >= WINNING_SCORE) {
-            add_placar_historico(game);
-            game->status = GAME_OVER;
-            game->jogador_vencedor = 2;
-        } else {
-            resetar_bola(game);
-        }
-        contador_colisoes = 0;
-        return;
-    }
-
-    // Ponto Esquerda
-    if (game->bola_x >= SCREEN_WIDTH) {
-        game->placar_esquerda++;
-        if (game->placar_esquerda >= WINNING_SCORE) {
-            add_placar_historico(game);
-            game->status = GAME_OVER;
-            game->jogador_vencedor = 1;
-        } else {
-            resetar_bola(game);
-        }
-        contador_colisoes = 0;
-        return;
-    }
-    
-    // Colisão Topo/Fundo
+    // Colisão com bordas superior/inferior
     if (game->bola_y <= 0 || game->bola_y >= SCREEN_HEIGHT - 1) {
         game->bola_dir_y *= -1;
-        printf("\a"); fflush(stdout);
-        return;
+        printf("\a"); // som de batida
+        fflush(stdout);
     }
 
-    // Colisão Raquete Esquerda 
-    if (game->bola_x <= 1.5f) { 
-        if (fabs(game->bola_y - game->raquete_esquerda) <= 2.5f) { 
-            float hit_pos = (game->bola_y - game->raquete_esquerda) / 2.0f;
-            
-            game->bola_dir_x = fabs(game->bola_dir_x); // Direita
-            game->bola_dir_y = hit_pos;
-            game->bola_x = 2;
-
-            contador_colisoes++;
-            if (contador_colisoes % 5 == 0 && fabs(game->bola_dir_x) < MAX_SPEED) {
-                game->bola_dir_x *= 1.1f;
-            }
-            printf("\a"); fflush(stdout);
-            return;
-        }
+    // Colisão com raquete esquerda
+    if (game->bola_x <= 1 && abs(game->bola_y - game->raquete_esquerda) <= 2) {
+        float hit_pos = (game->bola_y - game->raquete_esquerda) / 2.0f;
+        game->bola_dir_x = fabs(game->bola_dir_x) * 1.1f;
+        game->bola_dir_y = hit_pos;
+        game->bola_x = 2;
+        contador_colisoes++;
+        printf("\a");
+        fflush(stdout);
     }
 
-    // Colisão Raquete Direita 
-    if (game->bola_x >= SCREEN_WIDTH - 2.5f) {
-        if (fabs(game->bola_y - game->raquete_direita) <= 2.5f) {
-            float hit_pos = (game->bola_y - game->raquete_direita) / 2.0f;
-            
-            game->bola_dir_x = -fabs(game->bola_dir_x); // Esquerda
-            game->bola_dir_y = hit_pos;
-            game->bola_x = SCREEN_WIDTH - 3;
+    // Colisão com raquete direita
+    if (game->bola_x >= SCREEN_WIDTH - 2 && abs(game->bola_y - game->raquete_direita) <= 2) {
+        float hit_pos = (game->bola_y - game->raquete_direita) / 2.0f;
+        game->bola_dir_x = -fabs(game->bola_dir_x) * 1.1f;
+        game->bola_dir_y = hit_pos;
+        game->bola_x = SCREEN_WIDTH - 3;
+        contador_colisoes++;
+        printf("\a");
+        fflush(stdout);
+    }
 
-            contador_colisoes++;
-            if (contador_colisoes % 5 == 0 && fabs(game->bola_dir_x) < MAX_SPEED) {
-                game->bola_dir_x *= 1.1f;
-            }
-            printf("\a"); fflush(stdout);
-            return;
+    // Dificuldade dinâmica
+    if (contador_colisoes % 5 == 0 && fabs(game->bola_dir_x) < MAX_SPEED) {
+        game->bola_dir_x *= 1.1f;
+    }
+
+    // Sistema de pontuação
+    if (game->bola_x < 0 || game->bola_x >= SCREEN_WIDTH) {
+        if (game->bola_x < 0)
+            game->placar_direita++;
+        else
+            game->placar_esquerda++;
+        
+        printf("\a"); // som de ponto
+        fflush(stdout);
+
+        if (game->placar_esquerda >= WINNING_SCORE || game->placar_direita >= WINNING_SCORE) {
+            game->status = GAME_OVER;
+            game->jogador_vencedor = (game->placar_esquerda > game->placar_direita) ? 1 : 2;
+            add_placar_historico(game);
+        } else {
+            resetar_bola(game);
         }
     }
 }
