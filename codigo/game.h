@@ -30,6 +30,7 @@ typedef struct {
     GameStatus status;
     int jogador_vencedor;
     char **campo;
+    ScoreNode *historico_placar;
 } GameState;
 
 void jogo_inicio(GameState *game);
