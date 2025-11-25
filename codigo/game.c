@@ -296,33 +296,49 @@ void atualizar_jogo(GameState *game) {
 }
 
 void renderizar(GameState *game) {
-    if (game->status == MENU) {
-        mostrar_menu(game);
-    } 
-    else if (game->status == GAME_OVER) {
-        mostrar_game_over(game); 
-    } 
-    else if (game->status == PLAYING) { 
-        screenClear();
+    screenClear();
 
-        // Placar
+    if (game->status == PLAYING) {
         screenSetColor(WHITE, BLACK);
-        screenGotoxy(SCREEN_WIDTH/2 - 3, 0);
-        printf("%d - %d", game->placar_esquerda, game->placar_direita);
-
-        // Raquetes
-        screenSetColor(GREEN, BLACK);     
-        for(int i=-1; i<=1; i++) {
-            screenGotoxy(1, game->raquete_esquerda + i); printf("|");
-            screenGotoxy(SCREEN_WIDTH - 2, game->raquete_direita + i); printf("|");
-        }
 
         // Bola
-        screenSetColor(RED, BLACK);        
+        screenSetColor(YELLOW, BLACK);
         screenGotoxy((int)game->bola_x, (int)game->bola_y);
-        printf("O");
-        
+        putchar('O');
+
+        // Raquete esquerda
+        screenSetColor(WHITE, BLUE);
+        for (int i = -1; i <= 1; i++) {
+            int e = game->raquete_esquerda + i;
+            if (e >= 0 && e < SCREEN_HEIGHT) {
+                screenGotoxy(0, e);
+                putchar('|');
+            }
+        }
+
+        // Raquete direita
+        screenSetColor(WHITE, RED);
+        for (int i = -1; i <= 1; i++) {
+            int d = game->raquete_direita + i;
+            if (d >= 0 && d < SCREEN_HEIGHT) {
+                screenGotoxy(SCREEN_WIDTH - 1, d);
+                putchar('|');
+            }
+        }
+
+        // Placar
+        screenSetColor(GREEN, BLACK);
+        char placar[10];
+        sprintf(placar, "%d - %d", game->placar_esquerda, game->placar_direita);
+        screenGotoxy(SCREEN_WIDTH/2 - 3, 0);
+        printf("%s", placar);
         screenSetColor(WHITE, BLACK);
-    } 
+
+    } else if (game->status == MENU) {
+        mostrar_menu(game);
+    } else if (game->status == GAME_OVER) {
+        mostrar_game_over(game);
+    }
+
     screenUpdate();
 }
