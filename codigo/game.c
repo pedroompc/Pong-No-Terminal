@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 
 #define BALL_SPEED 1.8f
 #define MAX_SPEED 2.5f
@@ -170,7 +171,7 @@ void liberar(GameState *game) {
 
 void jogo_inicio(GameState *game) {
     srand(time(NULL));
-
+    
     game->campo = malloc(SCREEN_HEIGHT * sizeof(char *));
     for (int i = 0; i < SCREEN_HEIGHT; i++) {
         game->campo[i] = malloc(SCREEN_WIDTH * sizeof(char));
@@ -180,11 +181,12 @@ void jogo_inicio(GameState *game) {
     game->raquete_esquerda = game->raquete_direita = SCREEN_HEIGHT / 2;
     resetar_bola(game);
     game->placar_esquerda = game->placar_direita = 0;
-    game->historico_placar = NULL;
-    carregar_placar(game);
     game->quit = false;
     game->status = MENU;
     game->jogador_vencedor = 0;
+    game->historico_placar = NULL;
+    
+    carregar_placar(game);
 }
 
 void processar_input(GameState *game) {
@@ -192,46 +194,47 @@ void processar_input(GameState *game) {
     
     int ch = readch();
     
-    // MENU
+    // MENU 
     if (game->status == MENU) {
-        if (ch == ' ') game->status = PLAYING;
-        else if (ch == 'q' || ch == 'Q') game->quit = true;
-        else if (ch == 'r' || ch == 'R') resetar_placar(game);
+        if (ch == ' ')
+            game->status = PLAYING;
+        else if (ch == 'q' || ch == 'Q')
+            game->quit = true;
+        else if (ch == 'r' || ch == 'R')
+            resetar_placar(game);
         return;
     }
     
     // GAME OVER
-    if (game->status == GAME_OVER) {
-        if (ch == 'q' || ch == 'Q') {
-            game->quit = true;
-        }
-        return; 
+    if (game->status == GAME_OVER && (ch == 'q' || ch == 'Q')) {
+        game->quit = true;
+        return;
     }
 
-    // PLAYING
+    // JOGO
     if (game->status == PLAYING) {
         switch(ch) {
             case 'w': 
                 if (game->raquete_esquerda > 1) game->raquete_esquerda--; 
                 break;
             case 's': 
-                if (game->raquete_esquerda < SCREEN_HEIGHT-2) game->raquete_esquerda++; 
+                if (game->raquete_esquerda < SCREEN_HEIGHT - 2) game->raquete_esquerda++; 
                 break;
             case 'i': 
                 if (game->raquete_direita > 1) game->raquete_direita--; 
                 break;
             case 'k': 
-                if (game->raquete_direita < SCREEN_HEIGHT-2) game->raquete_direita++; 
+                if (game->raquete_direita < SCREEN_HEIGHT - 2) game->raquete_direita++; 
                 break;
-            
             case 'q':
             case 'Q':
-                game->status = MENU;
-                resetar_bola(game);
+                game->status = MENU;   
+                resetar_bola(game);   
                 return;
         }
     }
 }
+
 
 void atualizar_jogo(GameState *game) {
     static int contador_colisoes = 0;
