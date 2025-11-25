@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #define BALL_SPEED 1.8f
-#define MAX_SPEED 3.5f
+#define MAX_SPEED 2.5f
 #define SCORES_FILE "pong_scores.dat" 
 
 void salvar_placar(GameState *game);
