@@ -15,6 +15,18 @@ void salvar_placar(GameState *game);
 void carregar_placar(GameState *game);
 void resetar_placar(GameState *game);
 
+int get_terminal_width() {
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    return w.ws_col;
+}
+
+int get_terminal_height() {
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    return w.ws_row;
+}
+
 void resetar_bola(GameState *game) {
     game->bola_x = SCREEN_WIDTH / 2;
     game->bola_y = SCREEN_HEIGHT / 2;
