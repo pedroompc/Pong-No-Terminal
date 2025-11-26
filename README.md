@@ -33,6 +33,10 @@ O executável gerado se chama **`pong`**.
 - **Guilherme Baltar**
 - **Arthur Vonsosten**
 
+## 📺 ScreenCast 
+
+<a href="https://youtu.be/KslvQFyAWqI" target="_blank">Pong No Terminal</a>
+
 
 ## 📜 Licença
 MIT 
